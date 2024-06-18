@@ -1,0 +1,42 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
+
+# Membaca data dari file Excel
+df = pd.read_excel('datamotordc.xlsx')
+
+# Menampilkan informasi singkat tentang dataframe
+print(df.info())
+
+# Menampilkan data pertama dalam dataframe
+print(df.head())
+
+# Menentukan variabel independen dan dependen
+X = df[['V Input(Volt)', 'I Output(mA)', 'R Total(KΩ)', 'T/div(µS)', 'V/div(mV)']]
+y = df['Duty Cycle(%)']
+
+# Melakukan regresi linear menggunakan scikit-learn
+model = LinearRegression()
+model.fit(X, y)
+
+# Prediksi nilai Duty Cycle berdasarkan model regresi
+predictions = model.predict(X)
+
+# Menambahkan konstanta untuk statsmodels
+X_sm = sm.add_constant(X)
+
+# Melakukan regresi linear menggunakan statsmodels
+model_sm = sm.OLS(y, X_sm).fit()
+
+# Mencetak ringkasan hasil regresi
+print(model_sm.summary())
+
+# Plot hasil regresi
+plt.figure(figsize=(10, 6))
+plt.scatter(y, predictions, edgecolors='k', alpha=0.7)
+plt.plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2)
+plt.xlabel('Actual Duty Cycle (%)')
+plt.ylabel('Predicted Duty Cycle (%)')
+plt.title('Actual vs Predicted Duty Cycle')
+plt.show()
